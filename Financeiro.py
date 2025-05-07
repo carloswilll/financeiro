@@ -10,7 +10,7 @@ st.title("📊 Meu Painel Financeiro Pessoal")
 url = "https://raw.githubusercontent.com/carloswilll/financeiro/main/FINANCEIRO.CSV"
 
 # Leitura e tratamento de dados
-df = pd.read_csv(url, sep=";")
+df = pd.read_csv(url, sep=";", encoding="latin-1")
 df['Valor'] = df['Valor'].str.replace('R$', '', regex=False).str.replace('.', '', regex=False).str.replace(',', '.', regex=False).astype(float)
 df['Data'] = pd.to_datetime(df['Data'], dayfirst=True)
 
