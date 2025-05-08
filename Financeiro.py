@@ -9,23 +9,25 @@ st.set_page_config(page_title="Meu Painel Financeiro Pessoal", layout="wide")
 st.title("💰 Meu Painel Financeiro Pessoal")
 
 # 📁 Upload seguro de arquivo
-uploaded_file = st.file_uploader("📁 Faça upload do arquivo financeiro (.csv ou .xlsx)", type=["csv", "xlsx"])
+uploaded_file = st.file_uploader("📁 Faça upload do arquivo financeiro (.csv ou .xlsx)", type=["csv", "xlsx"], key="uploaded_file")
 
-if uploaded_file is not None:
-    try:
-        if uploaded_file.name.endswith('.csv'):
-            df = pd.read_csv(uploaded_file, sep=";", encoding="latin-1")
-        elif uploaded_file.name.endswith('.xlsx'):
-            df = pd.read_excel(uploaded_file)
-        else:
-            st.error("Tipo de arquivo não suportado. Por favor, envie um .csv ou .xlsx.")
-            st.stop()
-    except Exception as e:
-        st.error(f"Erro ao ler o arquivo: {e}")
-        st.stop()
-else:
+# Verifica se o arquivo está corrompido ou inválido
+if uploaded_file is None:
     st.warning("Por favor, carregue um arquivo para visualizar o dashboard.")
     st.stop()
+
+try:
+    if uploaded_file.name.endswith('.csv'):
+        df = pd.read_csv(uploaded_file, sep=";", encoding="latin-1")
+    elif uploaded_file.name.endswith('.xlsx'):
+        df = pd.read_excel(uploaded_file)
+    else:
+        st.error("Tipo de arquivo não suportado. Por favor, envie um .csv ou .xlsx.")
+        st.stop()
+except Exception as e:
+    st.error("Erro ao ler o arquivo. Tente reenviar o arquivo.")
+    st.experimental_rerun()  # força reinício seguro
+
 
 # 🧼 Limpeza e preparação de dados
 df['Data'] = pd.to_datetime(df['Data'], dayfirst=True, errors='coerce')
