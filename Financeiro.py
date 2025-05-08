@@ -2,9 +2,34 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-# Leitura dos dados
-url = "https://raw.githubusercontent.com/carloswilll/financeiro/main/FINANCEIRO.CSV"
-df = pd.read_csv(url, sep=";", encoding="latin-1")
+st.title("📊 Análise Financeira")
+
+# Upload do arquivo
+uploaded_file = st.file_uploader("Selecione o arquivo CSV", type="csv")
+
+if uploaded_file is not None:
+    # Leitura do arquivo
+    try:
+        df = pd.read_csv(uploaded_file, sep=";", encoding="latin-1")
+
+        # Conversão da coluna de data, se existir
+        if "Data" in df.columns:
+            df["Data"] = pd.to_datetime(df["Data"], dayfirst=True, errors="coerce")
+
+        # Exibe os dados
+        st.subheader("Prévia dos Dados")
+        st.dataframe(df)
+
+        # Exemplo de estatísticas
+        if "Valor a Pagar" in df.columns:
+            st.subheader("Resumo dos Valores a Pagar")
+            st.metric("Total", f'R$ {df["Valor a Pagar"].sum():,.2f}')
+            st.metric("Média", f'R$ {df["Valor a Pagar"].mean():,.2f}')
+    except Exception as e:
+        st.error(f"Erro ao processar o arquivo: {e}")
+else:
+    st.info("Por favor, envie um arquivo CSV.")
+
 
 # Tratamento de dados
 df["Data"] = pd.to_datetime(df["Data"], dayfirst=True)
